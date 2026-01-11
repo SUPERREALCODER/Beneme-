@@ -1,80 +1,87 @@
 
-import { GoogleGenAI, Type } from "@google/genai";
-import { BrainwaveMetrics } from "../types";
+import { BrainwaveMetrics, Pathway } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
+/**
+ * DETERMINISTIC INSIGHTS
+ * Replaces AI generation with a library of curated poetic reflections based on metrics.
+ */
 export async function getPersonalizedInsight(metrics: BrainwaveMetrics): Promise<string> {
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: `Based on current bio-metrics: Focus Score ${metrics.focusScore}/100 and Calm Score ${metrics.calmScore}/100. Provide a single, poetic, encouraging sentence of wellness advice. Keep it under 15 words. Avoid clinical jargon.`,
-    config: {
-      temperature: 0.7,
-      topP: 0.95,
-    }
-  });
-  return response.text || "Your inner garden is thriving in its own time.";
+  if (metrics.calmScore > 85) return "Your inner silence is a vast and welcoming ocean.";
+  if (metrics.focusScore > 85) return "Your attention is a bright beam of light, steady and clear.";
+  if (metrics.calmScore < 40) return "Gently return to your breath; even the storm moves across the sky.";
+  if (metrics.focusScore < 40) return "Let your thoughts drift like clouds until they find their own path.";
+  
+  const defaults = [
+    "Your inner garden is thriving in its own time.",
+    "Presence is the only place where life happens.",
+    "Be as you are, and you will find the peace you seek.",
+    "The rhythm of your mind is a unique melody."
+  ];
+  return defaults[Math.floor(Math.random() * defaults.length)];
 }
 
+/**
+ * RULE-BASED MUSIC RECOMMENDATIONS
+ */
 export async function getBioMusicRecommendation(metrics: BrainwaveMetrics): Promise<{ tempo: string, instrument: string, mood: string }> {
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: `Generate audio parameters for bio-adaptive ambient music. Bio-metrics: Focus ${metrics.focusScore}, Calm ${metrics.calmScore}.`,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          tempo: { type: Type.STRING },
-          instrument: { type: Type.STRING },
-          mood: { type: Type.STRING }
-        },
-        required: ["tempo", "instrument", "mood"]
-      }
-    }
-  });
-  
-  try {
-    return JSON.parse(response.text);
-  } catch (e) {
-    return { tempo: "slow", instrument: "piano", mood: "serene" };
+  if (metrics.calmScore > 70) {
+    return { tempo: "adagio", instrument: "ambient-piano", mood: "serene" };
+  } else if (metrics.focusScore > 70) {
+    return { tempo: "moderato", instrument: "warm-synth", mood: "energetic" };
   }
+  return { tempo: "slow", instrument: "cello", mood: "grounded" };
 }
 
+/**
+ * KEYWORD-BASED PATHWAY GENERATOR
+ * Replaces LLM logic with a structured mapping of user goals to wellness sequences.
+ */
 export async function generatePathway(goal: string, metrics: BrainwaveMetrics): Promise<any> {
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: `Design a personalized stress relief pathway for the goal: "${goal}". Current user metrics: Focus ${metrics.focusScore}, Calm ${metrics.calmScore}. 
-    Suggest a sequence of 3 steps. Each step must have: id, type (music, meditation, or breathing), title, duration (number in minutes), and intensity (Soft, Medium, or Deep).`,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          name: { type: Type.STRING },
-          steps: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                id: { type: Type.STRING },
-                type: { type: Type.STRING },
-                title: { type: Type.STRING },
-                duration: { type: Type.NUMBER },
-                intensity: { type: Type.STRING }
-              },
-              required: ["id", "type", "title", "duration", "intensity"]
-            }
-          }
-        },
-        required: ["name", "steps"]
-      }
-    }
-  });
+  const normalizedGoal = goal.toLowerCase();
   
-  try {
-    return JSON.parse(response.text);
-  } catch (e) {
-    return null;
+  // Simulation of a small delay to maintain the "curation" feel
+  await new Promise(resolve => setTimeout(resolve, 800));
+
+  if (normalizedGoal.includes('sleep') || normalizedGoal.includes('night') || normalizedGoal.includes('wind down')) {
+    return {
+      name: "The Lunar Descent",
+      steps: [
+        { id: 's1', type: 'music', title: 'Celestial Resonance', duration: 10, intensity: 'Soft' },
+        { id: 's2', type: 'meditation', title: 'The Infinite Shore', duration: 15, intensity: 'Medium' },
+        { id: 's3', type: 'breathing', title: '4-7-8 Rhythmic Cycles', duration: 5, intensity: 'Soft' }
+      ]
+    };
   }
+
+  if (normalizedGoal.includes('work') || normalizedGoal.includes('focus') || normalizedGoal.includes('study')) {
+    return {
+      name: "Neural Peak Flow",
+      steps: [
+        { id: 'f1', type: 'music', title: 'Binaural Alpha Waves', duration: 20, intensity: 'Medium' },
+        { id: 'f2', type: 'breathing', title: 'Box Breathing', duration: 5, intensity: 'Medium' },
+        { id: 'f3', type: 'meditation', title: 'Focused Observation', duration: 10, intensity: 'Deep' }
+      ]
+    };
+  }
+
+  if (normalizedGoal.includes('stress') || normalizedGoal.includes('anxiety') || normalizedGoal.includes('calm')) {
+    return {
+      name: "The Anchor's Peace",
+      steps: [
+        { id: 'a1', type: 'breathing', title: 'Ocean Breath', duration: 5, intensity: 'Soft' },
+        { id: 'a2', type: 'music', title: 'Forest Canopy Bath', duration: 15, intensity: 'Soft' },
+        { id: 'a3', type: 'meditation', title: 'Loving Kindness', duration: 10, intensity: 'Soft' }
+      ]
+    };
+  }
+
+  // Default "Quick Reset" Pathway
+  return {
+    name: "A Moment of Grace",
+    steps: [
+      { id: 'd1', type: 'breathing', title: 'Centering Breath', duration: 3, intensity: 'Medium' },
+      { id: 'd2', type: 'music', title: 'Morning Dew', duration: 7, intensity: 'Soft' },
+      { id: 'd3', type: 'meditation', title: 'Gratitude Scan', duration: 5, intensity: 'Medium' }
+    ]
+  };
 }
