@@ -1,0 +1,7 @@
+{
+  "name": "Beneme: Neurofeedback Haven",
+  "description": "A calming neurofeedback and digital wellbeing application that visualizes focus and stress levels through an organic digital garden and gamified environmental shifts.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
