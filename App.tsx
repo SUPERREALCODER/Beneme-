@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from './components/Layout';
 import GardenDashboard from './components/GardenDashboard';
 import NeurofeedbackCenter from './components/NeurofeedbackCenter';
@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [activeView, setActiveView] = useState<AppView>(AppView.DASHBOARD);
   const [isConnected, setIsConnected] = useState(false);
   const [insight, setInsight] = useState<string>("Your garden is waiting for your attention.");
+  const lastInsightUpdate = useRef<number>(0);
   
   // Simulated Bio-metrics
   const [metrics, setMetrics] = useState<BrainwaveMetrics>({
@@ -50,22 +51,25 @@ const App: React.FC = () => {
     }
   }, [isConnected]);
 
-  // Fetch Insight via Gemini when metrics significantly change
+  // Fetch Insight via local service periodically
   useEffect(() => {
     const fetchInsight = async () => {
+      const now = Date.now();
+      if (now - lastInsightUpdate.current < 5000) return; // Throttling
+      
       try {
         const msg = await getPersonalizedInsight(metrics);
         setInsight(msg);
+        lastInsightUpdate.current = now;
       } catch (e) {
-        console.error("Gemini failed", e);
+        console.error("Insight generation failed", e);
       }
     };
     
     if (isConnected) {
-      const timeout = setTimeout(fetchInsight, 10000);
-      return () => clearTimeout(timeout);
+      fetchInsight();
     }
-  }, [metrics.focusScore, isConnected]);
+  }, [metrics.focusScore, metrics.calmScore, isConnected]);
 
   const handleConnect = () => {
     setIsConnected(true);
