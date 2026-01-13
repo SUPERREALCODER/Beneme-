@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { GardenPlant, BrainwaveMetrics } from '../types';
-import { Sun, CloudRain, Wind, Sparkles, Brain, Trees as Garden, Zap, Waves, Leaf, Thermometer, Wind as AirIcon } from 'lucide-react';
+import { Sun, CloudRain, Wind, Sparkles, Brain, Trees as Garden, Zap, Waves, Leaf, Thermometer } from 'lucide-react';
 
 interface GardenDashboardProps {
   plants: GardenPlant[];
@@ -11,33 +11,32 @@ interface GardenDashboardProps {
 }
 
 const GardenDashboard: React.FC<GardenDashboardProps> = ({ plants, metrics, isConnected, onConnect }) => {
-  // AQI Level interpretation
-  const aqiInfo = useMemo(() => {
-    const val = metrics.aqi;
-    if (val <= 50) return { label: 'Pristine Air', color: 'bg-green-50', text: 'text-green-600', icon: Sun, desc: 'Ideal for deep neural focus.' };
-    if (val <= 100) return { label: 'Moderate Atmosphere', color: 'bg-yellow-50', text: 'text-yellow-600', icon: Wind, desc: 'Good conditions for light activity.' };
-    return { label: 'Hazy Environment', color: 'bg-orange-50', text: 'text-orange-600', icon: CloudRain, desc: 'Prioritize internal breathing focus.' };
-  }, [metrics.aqi]);
+  const currentStatus = useMemo(() => {
+    if (!isConnected) return { label: 'Awaiting Connection', color: 'bg-gray-100', icon: Wind, text: 'text-gray-500' };
+    if (metrics.calmScore > 80) return { label: 'Peak Stillness', color: 'bg-yellow-50', icon: Sun, text: 'text-yellow-600' };
+    if (metrics.calmScore > 50) return { label: 'Active Presence', color: 'bg-blue-50', icon: Wind, text: 'text-blue-600' };
+    return { label: 'Quiet Recovery', color: 'bg-indigo-50', icon: CloudRain, text: 'text-indigo-600' };
+  }, [metrics.calmScore, isConnected]);
 
-  const StatusIcon = aqiInfo.icon;
+  const StatusIcon = currentStatus.icon;
 
   const metricCards = [
     { 
-      label: 'Atmospheric Clarity (AQI)', 
-      icon: AirIcon, 
-      value: isConnected ? Math.round(metrics.aqi) : 0, 
-      max: 200, // Visual max for progress bar
-      color: metrics.aqi < 50 ? 'from-green-400 to-emerald-500' : 'from-yellow-400 to-orange-500',
-      desc: 'Lower is better. Measures the purity of your current surroundings.',
-      suffix: ''
+      label: 'Focus Energy', 
+      icon: Zap, 
+      value: isConnected ? metrics.focusScore : 0, 
+      max: 100,
+      color: 'from-[#B2AC88] to-[#003153]',
+      desc: 'Cognitive engagement and directed attention.',
+      suffix: '%'
     },
     { 
-      label: 'Stress Resilience', 
-      icon: Brain, 
+      label: 'Calm Stillness', 
+      icon: Waves, 
       value: isConnected ? metrics.calmScore : 0, 
       max: 100,
-      color: 'from-blue-400 to-[#003153]',
-      desc: 'Your biological response to environmental oxygen and stillness.',
+      color: 'from-blue-200 to-indigo-300',
+      desc: 'Physiological ease and mental quietude.',
       suffix: '%'
     }
   ];
@@ -46,31 +45,19 @@ const GardenDashboard: React.FC<GardenDashboardProps> = ({ plants, metrics, isCo
     <div className="p-4 md:p-8 h-full flex flex-col">
       <header className="mb-6 md:mb-10 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
         <div>
-          <p className="text-gray-400 font-medium mb-1 text-sm">Environmental Foundation</p>
+          <p className="text-gray-400 font-medium mb-1 text-sm">Inner Growth Journal</p>
           <h2 className="text-3xl md:text-4xl font-quicksand font-bold text-[#003153]">Your Soul Garden</h2>
         </div>
-        <div className={`flex items-center gap-3 px-5 py-2 md:py-3 rounded-full ${aqiInfo.color} shadow-sm border border-white w-fit transition-all duration-1000`}>
-          <StatusIcon className={aqiInfo.text} size={18} />
+        <div className={`flex items-center gap-3 px-5 py-2 md:py-3 rounded-full ${currentStatus.color} shadow-sm border border-white w-fit transition-all duration-1000`}>
+          <StatusIcon className={currentStatus.text} size={18} />
           <div className="flex flex-col">
-            <span className={`font-bold ${aqiInfo.text} text-xs md:text-sm`}>{aqiInfo.label}</span>
-            <span className="text-[10px] text-gray-500 font-medium">{aqiInfo.desc}</span>
+            <span className={`font-bold ${currentStatus.text} text-xs md:text-sm`}>{currentStatus.label}</span>
           </div>
         </div>
       </header>
 
-      {/* Garden Visualization driven by AQI */}
-      <div className={`flex-1 bg-white/60 rounded-[2.5rem] md:rounded-[4rem] border border-white shadow-xl relative overflow-hidden backdrop-blur-sm p-4 md:p-12 min-h-[400px] transition-all duration-[2000ms]`}>
+      <div className={`flex-1 bg-white/60 rounded-[2.5rem] md:rounded-[4rem] border border-white shadow-xl relative overflow-hidden backdrop-blur-sm p-4 md:p-12 min-h-[400px] transition-all duration-[2000ms] ${!isConnected ? 'grayscale-[0.3] opacity-90' : ''}`}>
         
-        {/* Haze overlay for high AQI */}
-        <div 
-          className="absolute inset-0 z-10 pointer-events-none transition-opacity duration-1000"
-          style={{ 
-            backgroundColor: 'rgba(255, 255, 255, 0.4)',
-            opacity: isConnected ? Math.min(0.6, (metrics.aqi / 200)) : 0.2,
-            backdropFilter: `blur(${isConnected ? Math.min(8, (metrics.aqi / 20)) : 2}px)`
-          }}
-        />
-
         {/* Garden Visualization Layer */}
         <div className="absolute inset-0 flex items-end justify-center pb-12 md:pb-20 overflow-hidden">
           <div className="absolute bottom-0 w-full h-32 bg-[#B2AC88]/20 blur-2xl" />
@@ -114,7 +101,7 @@ const GardenDashboard: React.FC<GardenDashboardProps> = ({ plants, metrics, isCo
           </div>
         </div>
 
-        {/* Environmental Overlay Stats */}
+        {/* Neural Overlay Stats */}
         <div className="absolute top-4 right-4 md:top-10 md:right-10 flex flex-col items-end space-y-3 md:space-y-4 max-w-[calc(100%-2rem)] z-20">
           {metricCards.map((stat, i) => (
             <div key={i} className="bg-white/60 backdrop-blur-xl p-4 md:p-5 rounded-[2rem] border border-white/50 w-full md:w-72 shadow-lg group hover:bg-white/80 transition-all">
@@ -136,7 +123,7 @@ const GardenDashboard: React.FC<GardenDashboardProps> = ({ plants, metrics, isCo
                     {isConnected ? Math.round(stat.value) : '--'}<span className="text-xs ml-1">{stat.suffix}</span>
                   </p>
                   <span className={`text-[9px] font-bold uppercase tracking-tighter ${isConnected ? 'text-[#B2AC88]' : 'text-gray-300'}`}>
-                    {isConnected ? 'Live Environment' : 'Sync Pending'}
+                    {isConnected ? 'Real-time' : 'Sync Pending'}
                   </span>
                </div>
             </div>
@@ -146,9 +133,9 @@ const GardenDashboard: React.FC<GardenDashboardProps> = ({ plants, metrics, isCo
       
       <footer className="mt-6 md:mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 pb-4">
         {[
-          { icon: Leaf, label: 'Neural Oxygenation', value: isConnected ? `${Math.round(metrics.oxygenation)}% Efficiency` : '--', color: 'text-emerald-500', bg: 'bg-emerald-50' },
-          { icon: AirIcon, label: 'Breath Sync', value: isConnected ? '14 Cycles/Min' : '--', color: 'text-blue-400', bg: 'bg-blue-50' },
-          { icon: Thermometer, label: 'Ambient Clarity', value: 'Excellent (22 AQI)', color: 'text-indigo-400', bg: 'bg-indigo-50' },
+          { icon: Brain, label: 'Weekly Sessions', value: isConnected ? '12 Cycles Complete' : '--', color: 'text-indigo-400', bg: 'bg-indigo-50' },
+          { icon: Garden, label: 'Biodiversity', value: '8 Species Flourishing', color: 'text-green-400', bg: 'bg-green-50' },
+          { icon: Sparkles, label: 'Zen Level', value: isConnected ? 'Lvl 4: Calm Observer' : 'Lvl 0: Novice', color: 'text-orange-400', bg: 'bg-orange-50' },
         ].map((item, i) => (
           <div key={i} className="bg-white p-4 md:p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-4">
             <div className={`w-10 h-10 md:w-12 md:h-12 ${item.bg} rounded-xl md:rounded-2xl flex items-center justify-center ${item.color}`}>

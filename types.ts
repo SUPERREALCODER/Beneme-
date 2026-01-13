@@ -14,8 +14,6 @@ export interface BrainwaveMetrics {
   delta: number; // Deep sleep
   focusScore: number; // 0-100
   calmScore: number;  // 0-100
-  aqi: number;        // 0-500 (standard AQI)
-  oxygenation: number; // 0-100 (simulated biological benefit)
 }
 
 export interface GardenPlant {
