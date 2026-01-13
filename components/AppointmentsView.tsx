@@ -274,8 +274,7 @@ const AppointmentsView: React.FC = () => {
                  <User size={28} />
                </div>
                <div>
-                 <p className="font-bold text-lg text-[#003153]">Dr. Arijit Das</p>
-                 <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Psychiatrist</p>
+                 <p className="font-bold text-lg text-[#003153]">Arijit Das</p>
                </div>
             </div>
             
