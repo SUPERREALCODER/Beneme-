@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { AppView } from '../types';
-import { Home, Brain, Library, Settings, Wind, Route } from 'lucide-react';
+import { Home, Sparkles, Library, Calendar, Wind, Route } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,10 +13,10 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, activeView, setActiveView, isHeadbandConnected }) => {
   const navItems = [
     { id: AppView.DASHBOARD, icon: Home, label: 'Garden' },
-    { id: AppView.NEUROFEEDBACK, icon: Brain, label: 'Neuro' },
+    { id: AppView.MEDITATION_SESSION, icon: Sparkles, label: 'Meditation' },
+    { id: AppView.APPOINTMENTS, icon: Calendar, label: 'Booking' },
     { id: AppView.PATHWAYS, icon: Route, label: 'Path' },
-    { id: AppView.MEDITATION, icon: Library, label: 'Library' },
-    { id: AppView.SETTINGS, icon: Settings, label: 'Settings' },
+    { id: AppView.MEDITATION_LIBRARY, icon: Library, label: 'Library' },
   ];
 
   return (
@@ -47,17 +47,8 @@ const Layout: React.FC<LayoutProps> = ({ children, activeView, setActiveView, is
           ))}
         </nav>
 
-        <div className="mt-auto w-full">
-          <div className={`p-4 rounded-3xl text-sm flex items-center gap-3 transition-colors ${
-            isHeadbandConnected ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700'
-          }`}>
-            <div className={`w-2 h-2 rounded-full animate-pulse ${
-              isHeadbandConnected ? 'bg-green-500' : 'bg-orange-500'
-            }`} />
-            <span className="font-medium">
-              {isHeadbandConnected ? 'Sync Active' : 'No Headband'}
-            </span>
-          </div>
+        <div className="mt-auto w-full pt-6 border-t border-gray-50">
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest text-center">Invisible Tech • Visible Calm</p>
         </div>
       </aside>
 

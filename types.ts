@@ -1,10 +1,10 @@
 
 export enum AppView {
   DASHBOARD = 'DASHBOARD',
-  NEUROFEEDBACK = 'NEUROFEEDBACK',
+  MEDITATION_SESSION = 'MEDITATION_SESSION',
+  APPOINTMENTS = 'APPOINTMENTS',
   PATHWAYS = 'PATHWAYS',
-  MEDITATION = 'MEDITATION',
-  SETTINGS = 'SETTINGS'
+  MEDITATION_LIBRARY = 'MEDITATION_LIBRARY'
 }
 
 export interface BrainwaveMetrics {
@@ -14,6 +14,8 @@ export interface BrainwaveMetrics {
   delta: number; // Deep sleep
   focusScore: number; // 0-100
   calmScore: number;  // 0-100
+  aqi: number;        // 0-500 (standard AQI)
+  oxygenation: number; // 0-100 (simulated biological benefit)
 }
 
 export interface GardenPlant {
@@ -49,16 +51,24 @@ export interface Pathway {
   steps: PathwayStep[];
 }
 
+export interface MeditationMode {
+  id: string;
+  title: string;
+  description: string;
+  targetMetric: 'focus' | 'calm';
+  duration: number; // minutes
+}
+
+export interface InsightMessage {
+  text: string;
+  type: 'encouragement' | 'guidance' | 'metric';
+}
+
 export interface Challenge {
   id: string;
   title: string;
   description: string;
   metric: 'focus' | 'calm' | 'transition';
   targetValue: number;
-  targetDuration: number; // seconds
-}
-
-export interface InsightMessage {
-  text: string;
-  type: 'encouragement' | 'guidance' | 'metric';
+  targetDuration: number; // duration in seconds
 }
